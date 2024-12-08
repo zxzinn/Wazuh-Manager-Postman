@@ -1,0 +1,60 @@
+{
+	"id": "wazuh-env",
+	"name": "Wazuh Environment",
+	"values": [
+		{
+			"key": "baseUrl",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "username",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "password",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "secret",
+			"enabled": true
+		},
+		{
+			"key": "AGENT_ID",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "GROUP_ID",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "group_id",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "file_name",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "filename",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		}
+	]
+}
