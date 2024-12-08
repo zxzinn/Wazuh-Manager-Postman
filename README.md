@@ -3,8 +3,8 @@
 ## 檔案說明
 
 本專案包含兩個主要檔案：
-- `Wazuh API.postman_collection.json`：Postman API 集合檔案
-- `wazuh-environment.json`：環境變數設定檔案
+- `Wazuh_Manager_postman_collection.json`：Postman API 集合檔案
+- `Wazuh_Manager_postman_enviroment.json`：環境變數設定檔案
 
 ## 功能特點
 
