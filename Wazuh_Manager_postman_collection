@@ -1,0 +1,1284 @@
+{
+	"info": {
+		"_postman_id": "64443f64-727e-4e6a-a908-5acafbe98358",
+		"name": "Wazuh API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39030143"
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"const getNewToken = () => {",
+					"    const username = pm.environment.get('username');",
+					"    const password = pm.environment.get('password');",
+					"    if (!username || !password) {",
+					"        console.error('Username or password not found in environment');",
+					"        return;",
+					"    }",
+					"",
+					"    const authRequest = {",
+					"        url: pm.environment.get('baseUrl') + '/security/user/authenticate',",
+					"        method: 'GET',",
+					"        header: {",
+					"            'Authorization': 'Basic ' + btoa(username + ':' + password)",
+					"        }",
+					"    };",
+					"",
+					"    pm.sendRequest(authRequest, (err, res) => {",
+					"        if (err || !res.json().data || !res.json().data.token) {",
+					"            console.error('Failed to get new token:', err || res.text());",
+					"            return;",
+					"        }",
+					"        const newToken = res.json().data.token;",
+					"        pm.environment.set('token', newToken);",
+					"        console.log('Token refreshed successfully');",
+					"    });",
+					"};",
+					"",
+					"// Check if token exists",
+					"const currentToken = pm.environment.get('token');",
+					"if (!currentToken) {",
+					"    console.log('No token found, getting new token...');",
+					"    getNewToken();",
+					"} else {",
+					"    // Token exists, check if it's valid by making a test request",
+					"    const testRequest = {",
+					"        url: pm.environment.get('baseUrl') + '/',",
+					"        method: 'GET',",
+					"        header: {",
+					"            'Authorization': 'Bearer ' + currentToken",
+					"        }",
+					"    };",
+					"",
+					"    pm.sendRequest(testRequest, (err, res) => {",
+					"        if (err || res.code === 401) {",
+					"            console.log('Token invalid or expired, getting new token...');",
+					"            getNewToken();",
+					"        } else {",
+					"            console.log('Token is valid');",
+					"        }",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"item": [
+		{
+			"name": "基本資訊",
+			"item": [
+				{
+					"name": "API資訊",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "代理程式管理",
+			"item": [
+				{
+					"name": "取得所有代理程式",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得代理程式金鑰",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/{{AGENT_ID}}/key",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"{{AGENT_ID}}",
+								"key"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得代理程式守護程序統計",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/{{AGENT_ID}}/daemons/stats",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"{{AGENT_ID}}",
+								"daemons",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得升級結果",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/upgrade_result",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"upgrade_result"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得無群組代理程式",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/no_group",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"no_group"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得過期代理程式",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/outdated",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"outdated"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得代理程式統計",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/stats/distinct",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"stats",
+								"distinct"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得作業系統摘要",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/summary/os",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"summary",
+								"os"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得狀態摘要",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/agents/summary/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"agents",
+								"summary",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "群組管理",
+			"item": [
+				{
+					"name": "取得所有群組",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/groups",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得群組設定",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/groups/{{group_id}}/configuration",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"groups",
+								"{{group_id}}",
+								"configuration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得群組檔案",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/groups/{{GROUP_ID}}/files",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"groups",
+								"{{GROUP_ID}}",
+								"files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得群組特定檔案",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/groups/{{group_id}}/files/{{file_name}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"groups",
+								"{{group_id}}",
+								"files",
+								"{{file_name}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "叢集管理",
+			"item": [
+				{
+					"name": "取得本地資訊",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cluster/local/info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cluster",
+								"local",
+								"info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得本地設定",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cluster/local/config",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cluster",
+								"local",
+								"config"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得節點列表",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cluster/nodes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cluster",
+								"nodes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得健康檢查",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cluster/healthcheck",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cluster",
+								"healthcheck"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得規則集同步狀態",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/cluster/ruleset/synchronization",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"cluster",
+								"ruleset",
+								"synchronization"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "MITRE",
+			"item": [
+				{
+					"name": "取得群組",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/groups",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得元數據",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/metadata",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"metadata"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得緩解措施",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/mitigations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"mitigations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得參考資料",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/references",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"references"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得軟體",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/software",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"software"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得戰術",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/tactics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"tactics"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得技術",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/mitre/techniques",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"mitre",
+								"techniques"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "規則管理",
+			"item": [
+				{
+					"name": "取得所有規則",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rules",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得規則群組",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rules/groups",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rules",
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得規則檔案",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rules/files",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rules",
+								"files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得特定規則檔案",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rules/files/{{filename}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"rules",
+								"files",
+								"{{filename}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "安全性設定",
+			"item": [
+				{
+					"name": "取得使用者資訊",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得使用者政策",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/users/me/policies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"users",
+								"me",
+								"policies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得所有使用者",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得動作",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/actions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"actions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得資源",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/resources",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"resources"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得角色",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得規則",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/rules",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"rules"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得政策",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/security/policies",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"security",
+								"policies"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "系統檢查",
+			"item": [
+				{
+					"name": "取得系統檢查結果",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/syscheck/{{AGENT_ID}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"syscheck",
+								"{{AGENT_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "取得最後掃描時間",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/syscheck/{{AGENT_ID}}/last_scan",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"syscheck",
+								"{{AGENT_ID}}",
+								"last_scan"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "任務管理",
+			"item": [
+				{
+					"name": "取得任務狀態",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "{{baseUrl}}"
+		}
+	]
+}
